@@ -48,15 +48,75 @@ def print_bom(items: List[Dict[str, object]]):
 def generate_demo_image(path: str, image_type: str = "table"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     if image_type == "engine":
-        # Generate metallic gray image for engine
-        img = Image.new("RGB", (800, 600), (120, 120, 125))  # metallic gray
+        # Generate realistic engine image with better details
+        img = Image.new("RGB", (800, 600), (45, 45, 50))  # dark background
         d = ImageDraw.Draw(img)
-        # Draw simple engine block shape
-        d.rectangle([(200, 150), (600, 450)], fill=(80, 80, 85))  # block
-        # cylinders
-        for i in range(3):
-            x = 250 + i * 120
-            d.ellipse([(x, 120), (x + 80, 180)], fill=(60, 60, 65))
+        
+        # Main engine block (V-shape)
+        block_color = (85, 85, 90)
+        d.polygon([(250, 250), (400, 180), (550, 250), (550, 450), (400, 480), (250, 450)], fill=block_color)
+        
+        # Cylinder heads (left bank)
+        head_color = (105, 105, 110)
+        d.rectangle([(180, 220), (250, 400)], fill=head_color)
+        d.rectangle([(175, 215), (255, 225)], fill=(75, 75, 80))  # top edge
+        
+        # Cylinder heads (right bank)
+        d.rectangle([(550, 220), (620, 400)], fill=head_color)
+        d.rectangle([(545, 215), (625, 225)], fill=(75, 75, 80))
+        
+        # Valve covers with bolts
+        cover_color = (140, 30, 25)  # red/orange valve covers
+        d.rectangle([(170, 230), (240, 390)], fill=cover_color)
+        d.rectangle([(560, 230), (630, 390)], fill=cover_color)
+        
+        # Bolts on valve covers
+        bolt_color = (180, 180, 185)
+        for y in range(250, 380, 40):
+            d.ellipse([(185, y), (195, y+10)], fill=bolt_color)
+            d.ellipse([(575, y), (585, y+10)], fill=bolt_color)
+        
+        # Oil pan
+        d.rectangle([(270, 450), (530, 500)], fill=(65, 65, 70))
+        d.rectangle([(280, 490), (520, 495)], fill=(45, 45, 50))  # drain plug line
+        
+        # Intake manifold on top
+        d.polygon([(320, 180), (400, 160), (480, 180), (460, 220), (340, 220)], fill=(95, 95, 100))
+        
+        # Alternator (circular)
+        d.ellipse([(580, 340), (650, 410)], fill=(75, 75, 80))
+        d.ellipse([(595, 355), (635, 395)], fill=(55, 55, 60))  # center
+        
+        # Starter motor
+        d.ellipse([(150, 360), (200, 410)], fill=(70, 70, 75))
+        d.rectangle([(125, 375), (150, 395)], fill=(80, 80, 85))  # mounting
+        
+        # Spark plug wires
+        wire_color = (200, 50, 50)
+        for i, x in enumerate([190, 210, 230, 570, 590, 610]):
+            y_start = 240 + (i % 3) * 40
+            d.line([(x, y_start), (x+10, y_start-30), (380+i*8, 190)], fill=wire_color, width=3)
+        
+        # Timing chain cover
+        d.polygon([(360, 250), (440, 250), (430, 350), (370, 350)], fill=(95, 95, 100))
+        
+        # Coolant hoses
+        hose_color = (40, 40, 45)
+        d.ellipse([(420, 175), (460, 195)], fill=hose_color)
+        d.ellipse([(340, 175), (380, 195)], fill=hose_color)
+        
+        # Belt pulleys
+        d.ellipse([(590, 280), (630, 320)], fill=(90, 90, 95))
+        d.ellipse([(600, 290), (620, 310)], fill=(70, 70, 75))
+        
+        # Oil filter (cylindrical)
+        d.rectangle([(480, 420), (530, 480)], fill=(200, 160, 50))  # gold/yellow
+        d.ellipse([(475, 415), (535, 425)], fill=(180, 140, 30))
+        
+        # Dipstick
+        d.rectangle([(320, 300), (325, 380)], fill=(220, 180, 60))
+        d.ellipse([(315, 295), (330, 305)], fill=(220, 180, 60))
+        
         img.save(path, format="PNG")
     else:
         # Original wood table
