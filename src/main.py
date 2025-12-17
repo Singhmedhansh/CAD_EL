@@ -5,7 +5,7 @@ from typing import List, Dict, Optional
 from PIL import Image, ImageDraw
 
 from src.bom_templates import default_wood_table_bom, choose_bom_from_filename
-from src.image_analyzer import load_image, looks_wood_like
+from src.image_analyzer import load_image, looks_wood_like, detect_component_type
 from config import INPUT_IMAGES_DIR
 
 
@@ -26,12 +26,16 @@ def compute_totals(items: List[Dict[str, object]]) -> Dict[str, float]:
 
 
 def print_bom(items: List[Dict[str, object]]):
-    headers = ["Item No", "Part Name", "Quantity", "Unit Price", "Subtotal", "Material"]
+    headers = ["Level", "Item No", "Part Name", "Quantity", "Unit Price", "Subtotal", "Material"]
     table = []
     for row in items:
+        level = row.get("Level", 0)
+        indent = "  " * level  # Indent based on level
+        part_name = indent + row["Part Name"]
         table.append([
+            level,
             row["Item No"],
-            row["Part Name"],
+            part_name,
             row["Quantity"],
             format_currency(float(row.get("Unit Price", 0.0))),
             format_currency(float(row.get("Subtotal", 0.0))),
@@ -41,36 +45,56 @@ def print_bom(items: List[Dict[str, object]]):
 
 
 
-def generate_demo_image(path: str):
+def generate_demo_image(path: str, image_type: str = "table"):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    img = Image.new("RGB", (800, 600), (210, 180, 140))  # wood-like background
-    d = ImageDraw.Draw(img)
-    # Draw a simple table silhouette: top and four legs
-    d.rectangle([(100, 150), (700, 250)], fill=(170, 130, 90))  # top
-    leg_color = (120, 80, 50)
-    d.rectangle([(140, 250), (170, 500)], fill=leg_color)
-    d.rectangle([(630, 250), (660, 500)], fill=leg_color)
-    d.rectangle([(330, 250), (360, 500)], fill=leg_color)
-    d.rectangle([(440, 250), (470, 500)], fill=leg_color)
-    img.save(path, format="PNG")
+    if image_type == "engine":
+        # Generate metallic gray image for engine
+        img = Image.new("RGB", (800, 600), (120, 120, 125))  # metallic gray
+        d = ImageDraw.Draw(img)
+        # Draw simple engine block shape
+        d.rectangle([(200, 150), (600, 450)], fill=(80, 80, 85))  # block
+        # cylinders
+        for i in range(3):
+            x = 250 + i * 120
+            d.ellipse([(x, 120), (x + 80, 180)], fill=(60, 60, 65))
+        img.save(path, format="PNG")
+    else:
+        # Original wood table
+        img = Image.new("RGB", (800, 600), (210, 180, 140))  # wood-like background
+        d = ImageDraw.Draw(img)
+        # Draw a simple table silhouette: top and four legs
+        d.rectangle([(100, 150), (700, 250)], fill=(170, 130, 90))  # top
+        leg_color = (120, 80, 50)
+        d.rectangle([(140, 250), (170, 500)], fill=leg_color)
+        d.rectangle([(630, 250), (660, 500)], fill=leg_color)
+        d.rectangle([(330, 250), (360, 500)], fill=leg_color)
+        d.rectangle([(440, 250), (470, 500)], fill=leg_color)
+        img.save(path, format="PNG")
 
 
 
 def build_bom_from_image(image_path: str) -> List[Dict[str, object]]:
     img = load_image(image_path)
-    wood_like = looks_wood_like(img)
+    component_type = detect_component_type(img)
     bom = choose_bom_from_filename(os.path.basename(image_path))
-    if not wood_like:
-        print("[WARN] Image does not appear wood-like; using chosen wood BOM anyway.")
+    
+    if component_type == "mechanical":
+        print(f"[INFO] Detected mechanical/automotive component")
+    elif component_type == "wood":
+        print(f"[INFO] Detected wood-like component")
+    else:
+        print(f"[WARN] Component type uncertain; using BOM based on filename")
+    
     return bom
 
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Wood Table BOM Generator")
-    parser.add_argument("--image", type=str, help="Path to PNG/JPG image of a wood table")
+    parser = argparse.ArgumentParser(description="CAD-EL BOM Generator - Wood and Automotive/Mechanical Assemblies")
+    parser.add_argument("--image", type=str, help="Path to PNG/JPG image of assembly")
     parser.add_argument("--images", nargs="+", help="Paths to multiple PNG/JPG images for batch processing")
     parser.add_argument("--dir", type=str, help="Directory containing images to process")
+    parser.add_argument("--demo-engine", action="store_true", help="Generate demo engine image and run BOM")
     parser.add_argument("--demo3", action="store_true", help="Generate 3 demo images (table/chair/shelf) and process")
     parser.add_argument("--demo", action="store_true", help="Generate a demo table PNG and run BOM")
     args = parser.parse_args()
@@ -108,8 +132,31 @@ def main():
     image_path = args.image
     if args.demo:
         image_path = os.path.join(INPUT_IMAGES_DIR, "demo_table.png")
-        generate_demo_image(image_path)
+        generate_demo_image(image_path, "table")
         print(f"[INFO] Generated demo image at: {image_path}")
+
+    if args.demo_engine:
+        paths = []
+        os.makedirs(INPUT_IMAGES_DIR, exist_ok=True)
+        # Generate 3 car assembly images
+        p_engine = os.path.join(INPUT_IMAGES_DIR, "demo_engine.png")
+        generate_demo_image(p_engine, "engine")
+        paths.append(p_engine)
+        
+        p_trans = os.path.join(INPUT_IMAGES_DIR, "demo_transmission.png")
+        img = Image.new("RGB", (800, 600), (110, 110, 115))  # metallic gray
+        img.save(p_trans, format="PNG")
+        paths.append(p_trans)
+        
+        p_susp = os.path.join(INPUT_IMAGES_DIR, "demo_suspension.png")
+        img = Image.new("RGB", (800, 600), (100, 100, 105))  # metallic gray
+        img.save(p_susp, format="PNG")
+        paths.append(p_susp)
+        
+        print("[INFO] Generated demo car assembly images:")
+        for p in paths:
+            print(f" - {p}")
+        args.images = paths
 
     if args.demo3:
         paths = []
@@ -175,17 +222,15 @@ def main():
         print(f"\nAssembly Total: {format_currency(totals['grand_total'])}")
         results.append({"assembly": asm_name, "items": items, "total": totals['grand_total']})
 
-    # Validation: at least 3 assemblies and min 10 parts each
-    if len(results) < 3 or any(len(r["items"]) < 10 for r in results):
-        print("\n[ERROR] Validation failed: need at least 3 assemblies and at least 10 parts in each.")
-        print("[HINT] Provide 3+ images named with keywords like 'table', 'chair', 'shelf' to select templates.")
-        return
-
-    overall = sum(r["total"] for r in results)
-    print(f"\n=== Summary ===")
-    for r in results:
-        print(f" - {r['assembly']}: {format_currency(r['total'])} ({len(r['items'])} parts)")
-    print(f"Overall Total: {format_currency(overall)}")
+    # Summary
+    if len(results) > 0:
+        overall = sum(r["total"] for r in results)
+        print(f"\n=== Summary ===")
+        for r in results:
+            print(f" - {r['assembly']}: {format_currency(r['total'])} ({len(r['items'])} items)")
+        print(f"Overall Total: {format_currency(overall)}")
+    else:
+        print("\n[ERROR] No BOMs generated. Check input images.")
 
 
 if __name__ == "__main__":

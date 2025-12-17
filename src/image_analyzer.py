@@ -3,6 +3,7 @@ from PIL import Image
 import numpy as np
 
 WOOD_HUE_RANGE = (15, 45)  # approx brown/orange hues in HSV (0-180 scale if using OpenCV), here we'll compute simplistic hue-like
+METAL_HUE_RANGE = (180, 240)  # gray/silver/metallic hues
 
 
 def load_image(path: str) -> Image.Image:
@@ -52,3 +53,21 @@ def looks_wood_like(img: Image.Image) -> bool:
     h, s, v = rgb_to_hsv(mean_rgb)
     # Map to rough brown range: ~15-45 degrees on 0-360 hue
     return 15 <= h <= 45 and s >= 0.2 and v >= 0.2
+
+
+def looks_metallic(img: Image.Image) -> bool:
+    """Detect if image looks metallic/mechanical (gray, silver tones with low saturation)."""
+    mean_rgb = average_color(img)
+    h, s, v = rgb_to_hsv(mean_rgb)
+    # Metallic: low saturation (grayish) and moderate to high value
+    return s <= 0.3 and v >= 0.3
+
+
+def detect_component_type(img: Image.Image) -> str:
+    """Detect whether image shows wood, metal/mechanical, or other component."""
+    if looks_metallic(img):
+        return "mechanical"
+    elif looks_wood_like(img):
+        return "wood"
+    else:
+        return "unknown"
