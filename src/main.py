@@ -204,12 +204,117 @@ def main():
         paths.append(p_engine)
         
         p_trans = os.path.join(INPUT_IMAGES_DIR, "demo_transmission.png")
-        img = Image.new("RGB", (800, 600), (110, 110, 115))  # metallic gray
+        # Generate detailed transmission image
+        img = Image.new("RGB", (800, 600), (35, 35, 40))
+        d = ImageDraw.Draw(img)
+        # Main transmission case
+        d.rectangle([(200, 200), (600, 500)], fill=(95, 95, 100))
+        d.rectangle([(195, 195), (605, 205)], fill=(75, 75, 80))  # top edge
+        # Bell housing (circular front)
+        d.ellipse([(150, 280), (250, 420)], fill=(85, 85, 90))
+        d.ellipse([(170, 300), (230, 400)], fill=(55, 55, 60))  # center hole
+        # Torque converter
+        d.ellipse([(100, 310), (180, 390)], fill=(110, 110, 115))
+        # Cooling lines
+        d.line([(300, 210), (300, 170), (450, 170), (450, 210)], fill=(40, 40, 45), width=8)
+        d.line([(350, 210), (350, 150), (500, 150), (500, 210)], fill=(40, 40, 45), width=8)
+        # Output shaft
+        d.rectangle([(600, 330), (720, 370)], fill=(70, 70, 75))
+        d.ellipse([(710, 320), (740, 380)], fill=(90, 90, 95))
+        # Valve body area
+        d.rectangle([(220, 480), (580, 520)], fill=(80, 80, 85))
+        # Bolts around case
+        bolt_color = (120, 120, 125)
+        for x in range(220, 580, 60):
+            d.ellipse([(x, 210), (x+10, 220)], fill=bolt_color)
+            d.ellipse([(x, 490), (x+10, 500)], fill=bolt_color)
+        for y in range(240, 480, 60):
+            d.ellipse([(210, y), (220, y+10)], fill=bolt_color)
+            d.ellipse([(590, y), (600, y+10)], fill=bolt_color)
+        # Shift linkage
+        d.line([(400, 200), (420, 140), (440, 140)], fill=(180, 180, 185), width=6)
+        d.ellipse([(435, 135), (455, 155)], fill=(150, 150, 155))
+        # Pan with drain plug
+        d.rectangle([(240, 500), (560, 530)], fill=(65, 65, 70))
+        d.ellipse([(395, 510), (405, 520)], fill=(180, 180, 185))
+        # TCM module
+        d.rectangle([(520, 250), (580, 320)], fill=(40, 40, 50))
+        d.rectangle([(525, 255), (575, 265)], fill=(200, 180, 60))  # connector
         img.save(p_trans, format="PNG")
         paths.append(p_trans)
         
         p_susp = os.path.join(INPUT_IMAGES_DIR, "demo_suspension.png")
-        img = Image.new("RGB", (800, 600), (100, 100, 105))  # metallic gray
+        # Generate detailed suspension image
+        img = Image.new("RGB", (800, 600), (30, 30, 35))
+        d = ImageDraw.Draw(img)
+        
+        # Left side suspension assembly
+        # Strut body (shock absorber)
+        strut_color = (90, 90, 95)
+        d.rectangle([(150, 150), (180, 420)], fill=strut_color)
+        d.ellipse([(145, 145), (185, 165)], fill=(110, 110, 115))  # top mount
+        # Piston rod
+        d.rectangle([(160, 80), (170, 150)], fill=(140, 140, 145))
+        d.ellipse([(155, 75), (175, 85)], fill=(120, 120, 125))
+        # Coil spring around strut
+        spring_color = (70, 70, 75)
+        for y in range(160, 400, 20):
+            d.arc([(130, y), (200, y+30)], start=180, end=0, fill=spring_color, width=8)
+            d.arc([(130, y+10), (200, y+40)], start=0, end=180, fill=spring_color, width=8)
+        # Lower control arm
+        arm_color = (80, 80, 85)
+        d.polygon([(100, 450), (180, 420), (280, 480), (200, 500)], fill=arm_color)
+        # Ball joint
+        d.ellipse([(155, 415), (185, 445)], fill=(100, 100, 105))
+        # Bushing mounts
+        d.ellipse([(95, 440), (115, 460)], fill=(50, 50, 55))
+        d.ellipse([(270, 470), (290, 490)], fill=(50, 50, 55))
+        # Steering knuckle
+        knuckle_color = (105, 105, 110)
+        d.polygon([(160, 420), (200, 420), (210, 500), (150, 500)], fill=knuckle_color)
+        # Wheel bearing hub
+        d.ellipse([(155, 480), (205, 530)], fill=(95, 95, 100))
+        d.ellipse([(170, 495), (190, 515)], fill=(60, 60, 65))  # center
+        
+        # Right side suspension assembly (mirror)
+        # Strut body
+        d.rectangle([(620, 150), (650, 420)], fill=strut_color)
+        d.ellipse([(615, 145), (655, 165)], fill=(110, 110, 115))
+        # Piston rod
+        d.rectangle([(630, 80), (640, 150)], fill=(140, 140, 145))
+        d.ellipse([(625, 75), (645, 85)], fill=(120, 120, 125))
+        # Coil spring
+        for y in range(160, 400, 20):
+            d.arc([(600, y), (670, y+30)], start=180, end=0, fill=spring_color, width=8)
+            d.arc([(600, y+10), (670, y+40)], start=0, end=180, fill=spring_color, width=8)
+        # Lower control arm
+        d.polygon([(700, 450), (650, 420), (520, 480), (600, 500)], fill=arm_color)
+        # Ball joint
+        d.ellipse([(615, 415), (645, 445)], fill=(100, 100, 105))
+        # Bushing mounts
+        d.ellipse([(685, 440), (705, 460)], fill=(50, 50, 55))
+        d.ellipse([(510, 470), (530, 490)], fill=(50, 50, 55))
+        # Steering knuckle
+        d.polygon([(600, 420), (640, 420), (650, 500), (590, 500)], fill=knuckle_color)
+        # Wheel bearing hub
+        d.ellipse([(595, 480), (645, 530)], fill=(95, 95, 100))
+        d.ellipse([(610, 495), (630, 515)], fill=(60, 60, 65))
+        
+        # Sway bar connecting both sides
+        sway_color = (85, 85, 90)
+        d.rectangle([(100, 465), (700, 480)], fill=sway_color)
+        # Sway bar links
+        d.line([(200, 465), (200, 440)], fill=(75, 75, 80), width=6)
+        d.line([(600, 465), (600, 440)], fill=(75, 75, 80), width=6)
+        d.ellipse([(195, 435), (205, 445)], fill=(90, 90, 95))
+        d.ellipse([(595, 435), (605, 445)], fill=(90, 90, 95))
+        
+        # Subframe/crossmember
+        d.rectangle([(80, 510), (720, 540)], fill=(70, 70, 75))
+        # Mounting bolts
+        for x in [100, 250, 400, 550, 700]:
+            d.ellipse([(x-5, 515), (x+5, 525)], fill=(120, 120, 125))
+        
         img.save(p_susp, format="PNG")
         paths.append(p_susp)
         
