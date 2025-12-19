@@ -54,6 +54,40 @@ def suspension_assembly_bom() -> List[Dict[str, object]]:
     ]
     return items
 
+
+def exhaust_assembly_bom() -> List[Dict[str, object]]:
+    """Exhaust system assembly - standalone with 10 major parts."""
+    items: List[Dict[str, object]] = [
+        {"Level": 0, "Item No": "1", "Part Name": "Exhaust Manifold", "Quantity": 2, "Unit Price": 225.00, "Material": "Cast iron, 3-into-1 design per bank"},
+        {"Level": 0, "Item No": "2", "Part Name": "Catalytic Converter", "Quantity": 2, "Unit Price": 385.00, "Material": "Ceramic substrate with platinum/rhodium catalyst"},
+        {"Level": 0, "Item No": "3", "Part Name": "O2 Sensor (Pre-cat)", "Quantity": 2, "Unit Price": 68.00, "Material": "Wideband heated oxygen sensor"},
+        {"Level": 0, "Item No": "4", "Part Name": "O2 Sensor (Post-cat)", "Quantity": 2, "Unit Price": 58.00, "Material": "Narrowband heated oxygen sensor"},
+        {"Level": 0, "Item No": "5", "Part Name": "Flex Pipe", "Quantity": 2, "Unit Price": 95.00, "Material": "Stainless steel braided flexible coupling"},
+        {"Level": 0, "Item No": "6", "Part Name": "Resonator", "Quantity": 1, "Unit Price": 125.00, "Material": "Stainless steel chambered design"},
+        {"Level": 0, "Item No": "7", "Part Name": "Muffler", "Quantity": 1, "Unit Price": 185.00, "Material": "Aluminized steel, dual-chamber absorption type"},
+        {"Level": 0, "Item No": "8", "Part Name": "Tailpipe", "Quantity": 2, "Unit Price": 65.00, "Material": "Stainless steel, 2.5-inch diameter"},
+        {"Level": 0, "Item No": "9", "Part Name": "Exhaust Hanger", "Quantity": 6, "Unit Price": 12.00, "Material": "Rubber isolation mount with steel bracket"},
+        {"Level": 0, "Item No": "10", "Part Name": "Exhaust Gasket Kit", "Quantity": 1, "Unit Price": 45.00, "Material": "Multi-layer steel and graphite gaskets"},
+    ]
+    return items
+
+
+def cooling_assembly_bom() -> List[Dict[str, object]]:
+    """Cooling system assembly - standalone with 10 major parts."""
+    items: List[Dict[str, object]] = [
+        {"Level": 0, "Item No": "1", "Part Name": "Radiator", "Quantity": 1, "Unit Price": 285.00, "Material": "Aluminum core with plastic tanks, 2-row"},
+        {"Level": 0, "Item No": "2", "Part Name": "Water Pump", "Quantity": 1, "Unit Price": 125.00, "Material": "Centrifugal impeller, cast aluminum housing"},
+        {"Level": 0, "Item No": "3", "Part Name": "Thermostat", "Quantity": 1, "Unit Price": 35.00, "Material": "Wax-pellet type, 180°F opening temperature"},
+        {"Level": 0, "Item No": "4", "Part Name": "Radiator Cap", "Quantity": 1, "Unit Price": 18.00, "Material": "16 PSI pressure rating with safety valve"},
+        {"Level": 0, "Item No": "5", "Part Name": "Cooling Fan", "Quantity": 2, "Unit Price": 95.00, "Material": "12V electric motor with 11-blade assembly"},
+        {"Level": 0, "Item No": "6", "Part Name": "Fan Shroud", "Quantity": 1, "Unit Price": 75.00, "Material": "Molded plastic with mounting brackets"},
+        {"Level": 0, "Item No": "7", "Part Name": "Radiator Hose (Upper)", "Quantity": 1, "Unit Price": 28.00, "Material": "EPDM rubber with reinforcement, 1.5-inch"},
+        {"Level": 0, "Item No": "8", "Part Name": "Radiator Hose (Lower)", "Quantity": 1, "Unit Price": 32.00, "Material": "EPDM rubber with spring insert, 1.5-inch"},
+        {"Level": 0, "Item No": "9", "Part Name": "Coolant Temperature Sensor", "Quantity": 1, "Unit Price": 42.00, "Material": "Thermistor type with electrical connector"},
+        {"Level": 0, "Item No": "10", "Part Name": "Expansion Tank", "Quantity": 1, "Unit Price": 55.00, "Material": "Translucent plastic with level sensor"},
+    ]
+    return items
+
 def default_wood_table_bom() -> List[Dict[str, object]]:
     items: List[Dict[str, object]] = [
         {"Level": 0, "Item No": "1", "Part Name": "Table Top Panel", "Quantity": 1, "Unit Price": 85.00, "Material": "Solid wood (oak/pine), ~1200x700x25mm"},
@@ -110,6 +144,10 @@ def choose_bom_from_filename(name: str) -> List[Dict[str, object]]:
         return transmission_assembly_bom()
     if "suspension" in lower or "strut" in lower:
         return suspension_assembly_bom()
+    if "exhaust" in lower or "muffler" in lower:
+        return exhaust_assembly_bom()
+    if "cooling" in lower or "radiator" in lower:
+        return cooling_assembly_bom()
     if "chair" in lower:
         return default_wood_chair_bom()
     if "shelf" in lower:

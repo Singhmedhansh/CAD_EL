@@ -198,7 +198,7 @@ def main():
     if args.demo_engine:
         paths = []
         os.makedirs(INPUT_IMAGES_DIR, exist_ok=True)
-        # Generate 3 car assembly images
+        # Generate 5 car assembly images
         p_engine = os.path.join(INPUT_IMAGES_DIR, "demo_engine.png")
         generate_demo_image(p_engine, "engine")
         paths.append(p_engine)
@@ -317,6 +317,123 @@ def main():
         
         img.save(p_susp, format="PNG")
         paths.append(p_susp)
+        
+        # Exhaust system
+        p_exhaust = os.path.join(INPUT_IMAGES_DIR, "demo_exhaust.png")
+        img = Image.new("RGB", (800, 600), (25, 25, 30))
+        d = ImageDraw.Draw(img)
+        # Exhaust manifolds (left and right)
+        manifold_color = (140, 90, 60)  # rusty/orange cast iron
+        d.polygon([(100, 200), (180, 180), (200, 280), (120, 300)], fill=manifold_color)
+        d.polygon([(700, 200), (620, 180), (600, 280), (680, 300)], fill=manifold_color)
+        # Collector pipes
+        pipe_color = (100, 100, 105)
+        d.rectangle([(200, 220), (350, 260)], fill=pipe_color)
+        d.rectangle([(450, 220), (600, 260)], fill=pipe_color)
+        # Catalytic converters (bulbous)
+        cat_color = (110, 110, 115)
+        d.ellipse([(320, 200), (400, 280)], fill=cat_color)
+        d.ellipse([(400, 200), (480, 280)], fill=cat_color)
+        # Heat shield pattern
+        for i in range(330, 470, 20):
+            d.line([(i, 210), (i+10, 270)], fill=(80, 80, 85), width=3)
+        # O2 sensors
+        sensor_color = (180, 180, 185)
+        d.line([(150, 200), (150, 160)], fill=sensor_color, width=4)
+        d.ellipse([(145, 155), (155, 165)], fill=sensor_color)
+        d.line([(650, 200), (650, 160)], fill=sensor_color, width=4)
+        d.ellipse([(645, 155), (655, 165)], fill=sensor_color)
+        # Center pipe with flex section
+        d.rectangle([(350, 230), (450, 250)], fill=pipe_color)
+        # Flex bellows
+        for x in range(370, 430, 8):
+            d.line([(x, 230), (x, 250)], fill=(70, 70, 75), width=2)
+        # Resonator
+        d.ellipse([(420, 300), (520, 380)], fill=(90, 90, 95))
+        d.rectangle([(400, 330), (420, 350)], fill=pipe_color)  # inlet
+        d.rectangle([(520, 330), (540, 350)], fill=pipe_color)  # outlet
+        # Main muffler
+        d.ellipse([(520, 420), (680, 520)], fill=(85, 85, 90))
+        d.rectangle([(540, 460), (560, 480)], fill=pipe_color)  # inlet
+        # Perforated pattern on muffler
+        for x in range(540, 660, 25):
+            for y in range(440, 500, 25):
+                d.ellipse([(x, y), (x+5, y+5)], fill=(60, 60, 65))
+        # Tailpipes
+        d.rectangle([(680, 455), (750, 475)], fill=(110, 110, 115))
+        d.rectangle([(680, 485), (750, 505)], fill=(110, 110, 115))
+        d.ellipse([(740, 450), (760, 480)], fill=(95, 95, 100))
+        d.ellipse([(740, 480), (760, 510)], fill=(95, 95, 100))
+        # Hangers
+        hanger_color = (50, 50, 55)
+        for x in [380, 470, 600]:
+            d.rectangle([(x, 260), (x+10, 290)], fill=hanger_color)
+            d.ellipse([(x+2, 285), (x+8, 295)], fill=hanger_color)
+        img.save(p_exhaust, format="PNG")
+        paths.append(p_exhaust)
+        
+        # Cooling system
+        p_cooling = os.path.join(INPUT_IMAGES_DIR, "demo_cooling.png")
+        img = Image.new("RGB", (800, 600), (20, 25, 30))
+        d = ImageDraw.Draw(img)
+        # Radiator
+        radiator_color = (90, 90, 95)
+        d.rectangle([(250, 150), (550, 450)], fill=radiator_color)
+        # Radiator fins/tubes (horizontal pattern)
+        for y in range(160, 440, 8):
+            d.line([(260, y), (540, y)], fill=(70, 70, 75), width=2)
+        # Radiator tanks (top and bottom)
+        tank_color = (60, 60, 70)
+        d.rectangle([(240, 130), (560, 160)], fill=tank_color)
+        d.rectangle([(240, 440), (560, 470)], fill=tank_color)
+        # Radiator cap on top
+        d.ellipse([(380, 120), (420, 140)], fill=(180, 180, 185))
+        d.ellipse([(390, 125), (410, 135)], fill=(140, 140, 145))
+        # Expansion tank
+        expansion_color = (80, 80, 90)
+        d.polygon([(580, 200), (680, 200), (670, 350), (590, 350)], fill=expansion_color)
+        d.line([(620, 220), (640, 220)], fill=(200, 200, 210), width=2)  # level marks
+        d.line([(620, 260), (640, 260)], fill=(200, 200, 210), width=2)
+        d.line([(620, 300), (640, 300)], fill=(200, 200, 210), width=2)
+        # Cooling fans behind radiator
+        fan_color = (50, 50, 55)
+        for x_offset in [0, 150]:
+            cx, cy = 320 + x_offset, 300
+            d.ellipse([(cx-60, cy-60), (cx+60, cy+60)], fill=fan_color)
+            d.ellipse([(cx-10, cy-10), (cx+10, cy+10)], fill=(70, 70, 75))
+            # Fan blades
+            for angle in range(0, 360, 45):
+                import math
+                x1 = cx + 15 * math.cos(math.radians(angle))
+                y1 = cy + 15 * math.sin(math.radians(angle))
+                x2 = cx + 50 * math.cos(math.radians(angle + 15))
+                y2 = cy + 50 * math.sin(math.radians(angle + 15))
+                d.polygon([(cx, cy), (x1, y1), (x2, y2)], fill=(80, 80, 85))
+        # Fan shroud
+        d.rectangle([(230, 180), (250, 420)], fill=(70, 70, 75))
+        d.rectangle([(550, 180), (570, 420)], fill=(70, 70, 75))
+        # Upper radiator hose
+        hose_color = (40, 40, 45)
+        d.arc([(200, 100), (300, 180)], start=270, end=0, fill=hose_color, width=20)
+        d.rectangle([(240, 100), (260, 140)], fill=hose_color)
+        # Lower radiator hose
+        d.arc([(200, 420), (300, 500)], start=0, end=90, fill=hose_color, width=20)
+        d.rectangle([(240, 460), (260, 500)], fill=hose_color)
+        # Water pump (on the side)
+        pump_color = (100, 100, 105)
+        d.ellipse([(150, 250), (220, 320)], fill=pump_color)
+        d.ellipse([(170, 270), (200, 300)], fill=(80, 80, 85))  # pulley
+        # Thermostat housing
+        d.polygon([(220, 140), (280, 140), (270, 180), (230, 180)], fill=(105, 105, 110))
+        # Coolant temp sensor
+        d.line([(280, 440), (320, 440)], fill=(180, 180, 185), width=5)
+        d.rectangle([(315, 435), (330, 445)], fill=(160, 160, 165))
+        # Hose clamps
+        clamp_color = (150, 150, 155)
+        for y in [130, 470]:
+            d.rectangle([(248, y), (252, y+10)], fill=clamp_color)
+        img.save(p_cooling, format="PNG")
+        paths.append(p_cooling)
         
         print("[INFO] Generated demo car assembly images:")
         for p in paths:
